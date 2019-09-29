@@ -1,0 +1,12 @@
+<script src="bundle.js"></script>
+<div style="height: 100%; background-color: red" id="section-1"></div>
+<div style="height: 100%; background-color: green" id="section-2"></div>
+<div style="height: 100%; background-color: blue" id="section-3"></div>
+<div style="height: 100%; background-color: yellow" id="section-4"></div>
+<script>
+    const sounds = new SectionSounds();
+    sounds.registerElement(document.getElementById("section-1"), "https://craftmend.com/a.mp3");
+    sounds.registerElement(document.getElementById("section-2"), "https://craftmend.com/b.mp3");
+    sounds.registerElement(document.getElementById("section-3"), "https://craftmend.com/c.mp3");
+    sounds.registerElement(document.getElementById("section-4"), "https://craftmend.com/pd.mp3");
+</script>
