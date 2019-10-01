@@ -26,8 +26,10 @@ class SectionSounds {
         // remove old sounds
         for (let source in this._media) {
             if (!updatedSources.includes(source)) {
-                this._media[source].setVolume(0, 250, () => {
-                    delete this._media[source];
+                this._media[source].setVolume({
+                    volume: 0, fadeTime: 250, onfinish: () => {
+                        delete this._media[source];
+                    }
                 });
             }
         }
@@ -35,15 +37,16 @@ class SectionSounds {
         // start new sounds
         updatedSources.forEach((source => {
             if (this._media[source] == null) {
-                let audio =  new WebAudio(source, () => {
+                let audio = new WebAudio(source, () => {
                     audio.setLooping(true);
                     audio.play();
                     audio.startDate();
-                    audio.setVolume(0);
-                    audio.setVolume(100, 250);
+                    audio.setVolume({volume: 0});
+                    audio.setVolume({volume: 100, fadeTime: 250});
                 }, this._bootTime);
-
                 this._media[source] = audio;
+            } else if (this._media[source].isFading) {
+                audio.setVolume({volume: 100, fadeTime: 250});
             }
         }));
     }

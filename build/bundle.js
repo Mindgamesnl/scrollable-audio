@@ -90,8 +90,10 @@
 	
 	            var _loop = function (source) {
 	                if (!updatedSources.includes(source)) {
-	                    _this2._media[source].setVolume(0, 250, function () {
-	                        delete _this2._media[source];
+	                    _this2._media[source].setVolume({
+	                        volume: 0, fadeTime: 250, onfinish: function onfinish() {
+	                            delete _this2._media[source];
+	                        }
 	                    });
 	                }
 	            };
@@ -108,12 +110,13 @@
 	                            audio.setLooping(true);
 	                            audio.play();
 	                            audio.startDate();
-	                            audio.setVolume(0);
-	                            audio.setVolume(100, 250);
+	                            audio.setVolume({ volume: 0 });
+	                            audio.setVolume({ volume: 100, fadeTime: 250 });
 	                        }, _this2._bootTime);
-	
 	                        _this2._media[source] = audio;
 	                    })();
+	                } else if (_this2._media[source].isFading) {
+	                    audio.setVolume({ volume: 100, fadeTime: 250 });
 	                }
 	            });
 	        }
@@ -231,7 +234,7 @@
 	        clearInterval(this.task);
 	        this._executeOnFinish();
 	      }
-	      this.setVolume(masterVolume);
+	      this.setVolume({ volume: masterVolume });
 	    }
 	  }, {
 	    key: "onFinish",
@@ -246,17 +249,20 @@
 	    }
 	  }, {
 	    key: "setVolume",
-	    value: function setVolume(volume, fadetime, onfinish) {
+	    value: function setVolume(_ref) {
 	      var _this = this;
 	
+	      var volume = _ref.volume;
+	      var fadeTime = _ref.fadeTime;
+	      var onfinish = _ref.onfinish;
+	
 	      //calculate volume if it is a speaker
-	      if (fadetime == null) {
+	      if (fadeTime == null) {
 	        this.soundElement.volume = volume / 100;
 	        return;
 	      }
 	      if (this.isFading) {
 	        clearInterval(this.task);
-	        this._executeOnFinish();
 	      }
 	      this._onFadeFinish = onfinish;
 	      var diff = volume - this.soundElement.volume * 100;
@@ -268,9 +274,9 @@
 	        steps = diff;
 	      }
 	
-	      if (fadetime == null) fadetime = 0;
+	      if (fadeTime == null) fadeTime = 0;
 	
-	      var interval = fadetime / steps;
+	      var interval = fadeTime / steps;
 	      var that = this;
 	      var callback = onfinish;
 	      var stepsMade = 0;
@@ -319,20 +325,6 @@
 	          cancel();
 	        }
 	      }, interval);
-	    }
-	  }, {
-	    key: "startDate",
-	    value: function startDate(date, flip) {
-	      var start = new Date(date);
-	      var length = this.soundElement.duration;
-	      if (seconds > length) {
-	        if (!flip) return;
-	        //how many times it would have played
-	        var times = Math.floor(seconds / length);
-	        //remove other repetitions from time
-	        seconds = seconds - times * length;
-	      }
-	      this.setTime(seconds);
 	    }
 	  }, {
 	    key: "startDate",
